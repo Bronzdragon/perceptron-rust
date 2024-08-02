@@ -93,7 +93,7 @@ pub struct Perceptron {
     dimensions: usize,
 
     #[pyo3(get)]
-    training_data: SampleSet,
+    data: SampleSet,
 
     #[pyo3(get)]
     model: Vec<f64>,
@@ -114,7 +114,7 @@ impl Perceptron {
     fn new(dimensions: usize, training_data: SampleSet) -> Self {
         Perceptron {
             dimensions,
-            training_data,
+            data: training_data,
             model: vec![0f64; dimensions],
             state: PerceptronState::Setup,
         }
@@ -126,7 +126,7 @@ impl Perceptron {
     /// # Example:
     /// p = Perceptron(2)
     /// p.add_training_samples([([1,2], 1), ([3,5], 1), ([-1, 4], -1), ([-7, 9], -1)])
-    fn add_training_samples(&mut self, samples: SampleSet) -> PyResult<()> {
+    fn add_samples(&mut self, samples: SampleSet) -> PyResult<()> {
         if self.state != PerceptronState::Setup {
             return Err(PyValueError::new_err(
                 "Cannot add training samples after training has started.",
@@ -139,7 +139,7 @@ impl Perceptron {
             )));
         }
 
-        self.training_data.extend(samples);
+        self.data.extend(samples);
 
         Ok(())
     }
@@ -150,14 +150,14 @@ impl Perceptron {
     /// # Example:
     /// p = Perceptron(2)
     /// p.replace_training_samples([([1,2], 1), ([3,5], 1), ([-1, 4], -1), ([-7, 9], -1)])
-    fn replace_training_samples(&mut self, samples: SampleSet) -> PyResult<()> {
-        self.clear_training_samples();
-        self.add_training_samples(samples)
+    fn replace_samples(&mut self, samples: SampleSet) -> PyResult<()> {
+        self.clear_samples();
+        self.add_samples(samples)
     }
 
     /// Clear all existing training data.
-    fn clear_training_samples(&mut self) {
-        self.training_data.clear()
+    fn clear_samples(&mut self) {
+        self.data.clear()
     }
 
     /// Start training our model.
@@ -168,7 +168,7 @@ impl Perceptron {
     /// model = p.train(10)
     fn train(&mut self, iterations: u32) -> Vec<f64> {
         assert!(
-            !self.training_data.is_empty(),
+            !self.data.is_empty(),
             "Training dataset is empty. Cannot train on an empty set."
         );
 
@@ -179,7 +179,7 @@ impl Perceptron {
             let mut done = true;
             count += 1;
 
-            for sample in self.training_data.0.iter() {
+            for sample in self.data.0.iter() {
                 let distance = signed_distance(&sample.data, &self.model);
                 let margin = distance * sample.label as f64;
 
