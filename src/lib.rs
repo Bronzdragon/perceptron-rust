@@ -97,6 +97,8 @@ pub struct Perceptron {
 
     #[pyo3(get)]
     model: Vec<f64>,
+
+    count: u32,
 }
 
 impl Perceptron {}
@@ -117,6 +119,7 @@ impl Perceptron {
             data: training_data,
             model: vec![0f64; dimensions],
             state: PerceptronState::Setup,
+            count: 0,
         }
     }
 
@@ -172,12 +175,11 @@ impl Perceptron {
             "Training dataset is empty. Cannot train on an empty set."
         );
 
-        let mut count = 0;
         let mut theta = vec![0f64; self.dimensions]; // Our offset goes on the end.
 
         for _ in 0..iterations {
             let mut done = true;
-            count += 1;
+            self.count += 1;
 
             for sample in self.data.0.iter() {
                 let distance = signed_distance(&sample.data, &self.model);
@@ -195,7 +197,7 @@ impl Perceptron {
 
                 // Add the current theta to the averaged theta:
                 for (average, new_digit) in self.model.iter_mut().zip(&theta) {
-                    *average += (*new_digit - *average) / (count + 1) as f64;
+                    *average += (*new_digit - *average) / (self.count) as f64;
                 }
             }
 
