@@ -16,6 +16,18 @@ p = Perceptron(dimensions, samples)
 p.train(iterations=10)
 ```
 
+Training data has to be provided in annotated sets. An n-dimensional vector (list of numbers) and either a `1` or `-1`, combined as a tuple. E.g.:
+```python
+data = [
+    ([1, 0, 0], -1),
+    ([0, 1, 0],  1),
+    ([0, 0, 1], -1),
+]
+```
+You can provide the data right as you create the Perceptron class, or you can provide it later (using the `.add_samples(samples)`, `.replace_samples(samples)` and `.clear_samples(samples)` methods).
+
+The last method available to you is the `.train(iterations)`, which allows you to start (or continue) training.
+
 ## Development
 This package is developed using [Maturin](https://github.com/PyO3/maturin). There are other alternatives available. If you are in doubt, please reach out.
 
