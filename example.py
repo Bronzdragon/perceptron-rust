@@ -1,4 +1,4 @@
-from perceptron import Perceptron
+from perceptron_rust import Perceptron
 import random
 import math
 
@@ -12,7 +12,7 @@ def main():
     samples = generate_samples(goal_theta, dimensions, sample_count)
 
     p = Perceptron(dimensions)
-    p.add_training_samples(samples)
+    p.add_samples(samples)
 
     actual_theta = p.train(100)
 

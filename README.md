@@ -1,4 +1,4 @@
-# Percentron-rs
+# Perceptron-Rust
 
 A basic implementation of the Perceptron algorithm, implemented using Rust, for Python.
 
@@ -9,7 +9,7 @@ pip install perceptron-rust
 ```
 
 ## Usage
-Install the Perceptron-rs package, then import it under the name `perceptron` as follows:
+Install the Perceptron-rust package, then import it under the name `perceptron-rust`. A short example:
 ```python
 from perceptron_rust import Perceptron
 
