@@ -2,11 +2,16 @@
 
 A basic implementation of the Perceptron algorithm, implemented using Rust, for Python.
 
+## Installation
+This package is available via PyPI, meaning you can use pip to install it.
+```sh
+pip install perceptron-rust
+```
 
 ## Usage
 Install the Perceptron-rs package, then import it under the name `perceptron` as follows:
 ```python
-from perceptron import Perceptron
+from perceptron_rust import Perceptron
 
 dimensions = 2
 samples = [([1,1], -1), ([-1, 1], +1), ([1, -1], -1), ([-1, -1], +1)]
@@ -15,7 +20,7 @@ p = Perceptron(dimensions, samples)
 p.train(iterations=10)
 ```
 
-Have a look at `example.py` for an in-situ example.
+Have a look at the example file [example.py](example.py) for in-situ usage.
 
 ### Training Data format
 Training data has to be provided in annotated sets. The data exists as a list, and each element is a tuple. Data, then the label. The data is a list of numbers (with the same dimension as you initialized the Perceptron with), and the label is either a `1` or `-1`. E.g.:
