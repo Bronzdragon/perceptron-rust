@@ -26,7 +26,9 @@ data = [
 ```
 You can provide the data right as you create the Perceptron class, or you can provide it later (using the `.add_samples(samples)`, `.replace_samples(samples)` and `.clear_samples(samples)` methods).
 
-The last method available to you is the `.train(iterations)`, which allows you to start (or continue) training.
+The last method available to you is the `.train(iterations)` which starts training for `iterations` number of iterations. You can call `.train()` multiple times, and it'll continue from where it left off last.
+
+Have a look at `example.py` for an in-situ example.
 
 ## Development
 This package is developed using [Maturin](https://github.com/PyO3/maturin). There are other alternatives available. If you are in doubt, please reach out.
