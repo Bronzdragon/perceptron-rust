@@ -257,7 +257,7 @@ fn normalize(vector: &mut [f64]) {
 
 /// Values exported to the Python module.
 #[pymodule]
-fn perceptron(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn perceptron_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Perceptron>()?;
 
     Ok(())
