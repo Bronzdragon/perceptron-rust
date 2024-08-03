@@ -5,7 +5,6 @@ A basic implementation of the Perceptron algorithm, implemented using Rust, for 
 
 ## Usage
 Install the Perceptron-rs package, then import it under the name `perceptron` as follows:
-
 ```python
 from perceptron import Perceptron
 
@@ -16,7 +15,10 @@ p = Perceptron(dimensions, samples)
 p.train(iterations=10)
 ```
 
-Training data has to be provided in annotated sets. An n-dimensional vector (list of numbers) and either a `1` or `-1`, combined as a tuple. E.g.:
+Have a look at `example.py` for an in-situ example.
+
+### Training Data format
+Training data has to be provided in annotated sets. The data exists as a list, and each element is a tuple. Data, then the label. The data is a list of numbers (with the same dimension as you initialized the Perceptron with), and the label is either a `1` or `-1`. E.g.:
 ```python
 data = [
     ([1, 0, 0], -1),
@@ -24,11 +26,27 @@ data = [
     ([0, 0, 1], -1),
 ]
 ```
-You can provide the data right as you create the Perceptron class, or you can provide it later (using the `.add_samples(samples)`, `.replace_samples(samples)` and `.clear_samples(samples)` methods).
 
-The last method available to you is the `.train(iterations)` which starts training for `iterations` number of iterations. You can call `.train()` multiple times, and it'll continue from where it left off last.
+### Methods available
+```py
+p.add_samples(data)
+```
+Appends samples to the currently stored set. Make sure they follow the data format described above.
 
-Have a look at `example.py` for an in-situ example.
+```python
+p.clear_samples()
+```
+Removes all samples already stored. (If some training has occurred, this will finalize the training.)
+
+```python
+p.replace_samples(samples)
+```
+Clears all existing samples and adds the provided samples. Make sure these follow the data format described above.
+
+```py
+p.train(iterations, should_normalize=True)
+```
+Trains for number of iterations provided. Calling this method multiple times will train it in steps. Once training has started, you cannot change the samples any more. You can normalize the output, but this will finalize the model. It cannot be trained further after this.
 
 ## Development
 This package is developed using [Maturin](https://github.com/PyO3/maturin). There are other alternatives available. If you are in doubt, please reach out.
