@@ -1,6 +1,6 @@
 # Perceptron-Rust
 
-A basic implementation of the Perceptron algorithm, implemented using Rust, for Python.
+A basic implementation of the Perceptron algorithm as a Python package, using Rust.
 
 ## Installation
 This package is available via PyPI, meaning you can use pip to install it.
@@ -14,13 +14,18 @@ Install the Perceptron-rust package, then import it under the name `perceptron-r
 from perceptron_rust import Perceptron
 
 dimensions = 2
-samples = [([1,1], -1), ([-1, 1], +1), ([1, -1], -1), ([-1, -1], +1)]
+samples = [
+    ([ 1, 1],-1),
+    ([-1, 1], 1),
+    ([ 1,-1],-1),
+    ([-1,-1], 1)
+]
 
 p = Perceptron(dimensions, samples)
 p.train(iterations=10)
 ```
 
-Have a look at the example file [example.py](example.py) for in-situ usage.
+Have a look at the example file [example.py](example.py) for a more complex example.
 
 ### Training Data format
 Training data has to be provided in annotated sets. The data exists as a list, and each element is a tuple. Data, then the label. The data is a list of numbers (with the same dimension as you initialized the Perceptron with), and the label is either a `1` or `-1`. E.g.:
@@ -52,6 +57,12 @@ Clears all existing samples and adds the provided samples. Make sure these follo
 p.train(iterations, should_normalize=True)
 ```
 Trains for number of iterations provided. Calling this method multiple times will train it in steps. Once training has started, you cannot change the samples any more. You can normalize the output, but this will finalize the model. It cannot be trained further after this.
+
+## Properties (read-only)
+`dimensions` - The dimensions of the data expected by the machine.  
+`model`      - The calculated model. Will be a null-vector until training.  
+`state`      - One of `"State"`, `"Trained"` or `"Finished"`, indicating the current state of the machine.  
+`data`       - All the data fed into the machine so far.  
 
 ## Development
 This package is developed using [Maturin](https://github.com/PyO3/maturin). There are other alternatives available. If you are in doubt, please reach out.
