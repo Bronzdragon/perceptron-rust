@@ -14,7 +14,7 @@ impl IntoPy<PyObject> for Sample {
     }
 }
 
-// Custom implementation since we take in a tuple, instead of an object.
+// Custom implementation since we take in a tuple, instead of an object with named properties.
 impl FromPyObject<'_> for Sample {
     fn extract_bound(ob: &Bound<'_, PyAny>) -> PyResult<Self> {
         let tuple = ob.downcast::<pyo3::types::PyTuple>()?;
@@ -26,8 +26,8 @@ impl FromPyObject<'_> for Sample {
             )));
         }
 
-        let label: i8 = tuple.get_item(1)?.extract()?;
         let data: Vec<f64> = tuple.get_item(0)?.extract()?;
+        let label: i8 = tuple.get_item(1)?.extract()?;
         if label != 1 && label != -1 {
             return Err(PyValueError::new_err(format!(
                 "The only labels allowed are +1 and -1. Got {label}."
@@ -73,6 +73,7 @@ impl IntoPy<PyObject> for SampleSet {
 enum PerceptronState {
     Setup,
     Trained,
+    Finished,
 }
 
 impl ToPyObject for PerceptronState {
@@ -80,6 +81,7 @@ impl ToPyObject for PerceptronState {
         match self {
             Self::Setup => "Setup".into_py(py),
             Self::Trained => "Trained".into_py(py),
+            Self::Finished => "Finished".into_py(py),
         }
     }
 }
@@ -154,12 +156,23 @@ impl Perceptron {
     /// p = Perceptron(2)
     /// p.replace_training_samples([([1,2], 1), ([3,5], 1), ([-1, 4], -1), ([-7, 9], -1)])
     fn replace_samples(&mut self, samples: SampleSet) -> PyResult<()> {
+        if self.state != PerceptronState::Setup {
+            return Err(PyValueError::new_err(
+                "Cannot change training samples after training has started.",
+            ));
+        }
+
         self.clear_samples();
         self.add_samples(samples)
     }
 
     /// Clear all existing training data.
     fn clear_samples(&mut self) {
+        if self.state == PerceptronState::Trained {
+            // Cannot train more without data.
+            self.state = PerceptronState::Finished
+        }
+
         self.data.clear()
     }
 
@@ -169,10 +182,15 @@ impl Perceptron {
     /// p = Perceptron(2)
     /// p.add_training_samples([([1,2], 1), ([3,5], 1), ([-1, 4], -1), ([-7, 9], -1)])
     /// model = p.train(10)
-    fn train(&mut self, iterations: u32) -> Vec<f64> {
+    #[pyo3(signature = (iterations, should_normalize=true))]
+    fn train(&mut self, iterations: u32, should_normalize: bool) -> Vec<f64> {
         assert!(
             !self.data.is_empty(),
             "Training dataset is empty. Cannot train on an empty set."
+        );
+        assert_ne!(
+            self.state, PerceptronState::Finished,
+            "Cannot continue training, Perceptron is in a finished state."
         );
 
         let mut theta = vec![0f64; self.dimensions]; // Our offset goes on the end.
@@ -195,7 +213,7 @@ impl Perceptron {
                     }
                 }
 
-                // Add the current theta to the averaged theta:
+                // Add the current theta to the averaged theta using a cumulative average.
                 for (average, new_digit) in self.model.iter_mut().zip(&theta) {
                     *average += (*new_digit - *average) / (self.count) as f64;
                 }
@@ -207,7 +225,9 @@ impl Perceptron {
             }
         }
         self.state = PerceptronState::Trained;
-        normalize(&mut self.model);
+        if should_normalize {
+            normalize(&mut self.model)
+        }
 
         self.model.clone()
     }
